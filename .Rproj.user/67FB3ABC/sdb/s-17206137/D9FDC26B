@@ -1,0 +1,17 @@
+{
+    "contents" : "# Date : 20 April 2015\n# Author : V.Kolipakam\n\n#1. Code to merge the train and test data and make a new dataset.\n\nA1 <- read.table(\"train/X_train.txt\")\nA2 <- read.table(\"test/X_test.txt\")\nX <- rbind(A1, A2)\n\nA1 <- read.table(\"train/subject_train.txt\")\nA2<- read.table(\"test/subject_test.txt\")\nS <- rbind(A1, A2)\n\nA1 <- read.table(\"train/y_train.txt\")\nA2 <- read.table(\"test/y_test.txt\")\nY <- rbind(A1, A2)\n\n#2.Code to extract only mean and standard deviation .\n\nfeatures <- read.table(\"features.txt\")\nindices_of_good_features <- grep(\"-mean\\\\(\\\\)|-std\\\\(\\\\)\", features[, 2])\nX <- X[, indices_of_good_features]\nnames(X) <- features[indices_of_good_features, 2]\nnames(X) <- gsub(\"\\\\(|\\\\)\", \"\", names(X))\nnames(X) <- tolower(names(X))\n\n# 3.Code for descriptive activity names in the data set.\n\nactivities <- read.table(\"activity_labels.txt\")\nactivities[, 2] = gsub(\"_\", \"\", tolower(as.character(activities[, 2])))\nY[,1] = activities[Y[,1], 2]\nnames(Y) <- \"activity\"\n\n# 4.Code for appropriate labels of the data set from the descriptive names.\n\nnames(S) <- \"subject\"\ncleaned <- cbind(S, Y, X)\nwrite.table(cleaned, \"merged_clean_data.txt\")\n\n# 5. Code for the second tidy dataset with the average of each variable for each activity and each subject.\n\nuniqueSubjects = unique(S)[,1]\nnumSubjects = length(unique(S)[,1])\nnumActivities = length(activities[,1])\nnumCols = dim(cleaned)[2]\nresult = cleaned[1:(numSubjects*numActivities), ]\n\nrow = 1\nfor (s in 1:numSubjects) {\n  for (a in 1:numActivities) {\n    result[row, 1] = uniqueSubjects[s]\n    result[row, 2] = activities[a, 2]\n    tmp <- cleaned[cleaned$subject==s & cleaned$activity==activities[a, 2], ]\n    result[row, 3:numCols] <- colMeans(tmp[, 3:numCols])\n    row = row+1\n  }\n}\nwrite.table(result, \"data_set_with_the_averages.txt\")\n\n",
+    "created" : 1429560710997.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3139134364",
+    "id" : "D9FDC26B",
+    "lastKnownWriteTime" : 1429561926,
+    "path" : "~/Downloads/UCI HAR Dataset/run_analysis.R",
+    "project_path" : "run_analysis.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
